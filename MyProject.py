@@ -5,6 +5,14 @@ from datetime import date
 import sqlite3
 import os
 
+class ConexionDB:
+     def __init__(self):
+
+          self.ruta = os.path.join(os.path.dirname(__file__),'MedidasSemanales.db')
+
+     def conectar(self):
+          return sqlite3.connect(self.ruta)
+
 class ventanaPrincipal:
     def __init__(self,contenedor):
 
@@ -73,8 +81,9 @@ class Insertar:
                messagebox.showerror('Fitness World','Invalid data: The measurements must be numerical.')
                return
              
-          ruta = os.path.join(os.path.dirname(__file__),'MedidasSemanales.db')
-          db1=sqlite3.connect(ruta)
+          conexion = ConexionDB()
+          db1 = conexion.conectar()
+
           print('Insert function')
           consulta=db1.cursor()
 
@@ -147,9 +156,10 @@ class Consultar:
           self.loadDates()
 
      def loadDates(self):
-          ruta=os.path.join(os.path.dirname(__file__),'MedidasSemanales.db')
-          db=sqlite3.connect(ruta)
-          consulta=db.cursor()
+          conexion = ConexionDB()
+          db3 = conexion.conectar()
+
+          consulta=db3.cursor()
           try:
                consulta.execute("""SELECT DISTINCT date
                                    FROM medidas
@@ -166,7 +176,7 @@ class Consultar:
                messagebox.showerror('Fitness World', f'ERROR: It was not possible to load the dates. \n\n{e}')
           finally:
                consulta.close()
-               db.close()
+               db3.close()
 
      def consultData(self):
           fecha=self.combo.get()
@@ -175,8 +185,9 @@ class Consultar:
                messagebox.showerror('Fitness World','Select a date')
                return
           
-          ruta= os.path.join(os.path.dirname(__file__),'MedidasSemanales.db')
-          db2=sqlite3.connect(ruta)
+          conexion = ConexionDB()
+          db2 = conexion.conectar()
+          
           print('Consult function')
           db2.row_factory=sqlite3.Row
           consulta=db2.cursor()
