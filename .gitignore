@@ -1,0 +1,14 @@
+# Base de datos
+MedidasSemanales.db
+
+# Apuntes personales
+BlocMyProject.txt
+
+# Archivos de Python
+__pycache__/
+*.pyc
+Borrador.py
+
+# Entorno virtual
+venv/
+.venv/
