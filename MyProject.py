@@ -18,9 +18,11 @@ class ventanaPrincipal:
 
         self.insertar = Button(contenedor,text='Introduce measures',fg='black', bg='white',width=15, height=2,command=lambda:Insertar())
         self.consultar = Button(contenedor,text='Consul measures',fg='black', bg='white',width=15, height=2,command=lambda:Consultar())
+        self.borrar = Button(contenedor,text='Delete mensures',fg='black',bg='white',width=15,height=2,command=lambda:Borrar())
 
         self.insertar.grid(column=0,row=0)
         self.consultar.grid(column=1,row=0)
+        self.borrar.grid(column=2,row=0)
 
 class Insertar:
      def __init__(self):
@@ -104,7 +106,7 @@ class Insertar:
 class Consultar:
      def __init__(self):
           windowsconsult=Toplevel()
-          windowsconsult.geometry('800x400')
+          windowsconsult.geometry('1200x400')
           windowsconsult.title('Fitness World')
 
           
@@ -224,6 +226,82 @@ class Consultar:
                consulta.close()
                db2.close()
 
+class Borrar:
+     def __init__(self):
+          windowDelete=Toplevel()
+          windowDelete.geometry('400x300')
+          windowDelete.title('Fitness World')
+
+          self.select=Label(windowDelete,text='Select records',fg='black',bg='white')
+          self.select.pack(side=TOP)
+
+          self.combo=ttk.Combobox(windowDelete,state='readonly')
+          self.combo.pack(pady=20)
+          self.delete=Button(windowDelete,text='Delete',fg='black',bg='cyan',command=self.deleteData)
+          self.delete.pack(side=TOP)
+
+          self.loadDates()
+
+     def loadDates(self):
+          conexion = ConexionDB()
+          db4 = conexion.conectar()
+          consulta=db4.cursor()
+
+          try:
+               consulta.execute("""SELECT DISTINCT date
+                                   FROM medidas
+                                   ORDER BY date""")
+               fechas=consulta.fetchall()#guarda el resultado de la consulta
+
+               opciones=[]
+               for fecha in fechas:
+                    opciones.append(fecha[0])
+               #Introducir las fechas en el combobox
+               self.combo['values']=opciones
+          except sqlite3.Error as e:
+               messagebox.showerror('Fitness World', f'ERROR: It was not possible to load the dates. \n\n{e}')
+          finally:
+               consulta.close()
+               db4.close()
+
+     def deleteData(self):
+
+          fecha=self.combo.get()
+
+          if not fecha:
+               messagebox.showerror('Fitness World','Select a date')
+               return
+          
+          mensaje=f"Are you sure you want to delete the record? {fecha} ?"
+          respuesta=messagebox.askyesno('Fitness Word',message=mensaje)
+
+          if respuesta:
+
+               conexion = ConexionDB()
+               db5 = conexion.conectar()
+               consulta=db5.cursor()          
+               print('Delete function')
+          
+
+               try:
+                    consulta.execute("""DELETE FROM medidas
+                                        WHERE date=?""",(fecha,))#DeELETE elimina la tabla completa
+               
+                    db5.commit()#Guarda los cambios permanentemente realizados en la base
+
+                    messagebox.showinfo('Fitness World','Record deleted seccessfully')
+
+                    self.loadDates()#RECARGAMOS LAS FECHAS
+
+               except sqlite3.Error as e:
+                    messagebox.showerror("Fitness world", f"ERROR: It was not possible to delete the records.\n\n{e}")
+               finally:
+                    consulta.close()
+                    db5.close()
+          else:
+               messagebox.showinfo('Fitness World','Operation cancelled')
+
+          
      
 ventana=Tk()
 miInterfaz=ventanaPrincipal(ventana)
@@ -231,6 +309,7 @@ ventana.title('Mundo Fit')
 ventana.geometry('400x300')
 ventana.columnconfigure(0,weight=1)
 ventana.columnconfigure(1,weight=1)
+ventana.columnconfigure(2,weight=1)
 ventana.rowconfigure(0,weight=1)
 
 ventana.mainloop()
