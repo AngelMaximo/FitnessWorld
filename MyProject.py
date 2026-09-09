@@ -93,7 +93,16 @@ class Insertar:
                consulta.execute("INSERT INTO medidas (date, weight, waist, biceps, leg, gluteus) VALUES(?, ?, ?, ?, ?, ?)",
                                    (date1,weight,waist,biceps,leg,gluteus))
                db1.commit()
+
                messagebox.showinfo(title='Fitness world',message='Data sent successfully')
+
+               #Borrar el contenido de los Entry
+               self.weight1.delete(0,END)
+               self.waist1.delete(0,END)
+               self.biceps1.delete(0,END)
+               self.leg1.delete(0,END)
+               self.gluteus1.delete(0,END)
+
                print('Record inserted successfully.')
 
           except sqlite3.Error as e:
