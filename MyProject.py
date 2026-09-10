@@ -24,6 +24,30 @@ class ventanaPrincipal:
         self.consultar.grid(column=1,row=0)
         self.borrar.grid(column=2,row=0)
 
+class MedidasDB:
+     def obtenerFechas(self):
+          conexion = ConexionDB()
+          db4 = conexion.conectar()
+          consulta=db4.cursor()
+
+          try:
+               consulta.execute("""SELECT DISTINCT date
+                                   FROM medidas
+                                   ORDER BY date""")
+               fechas=consulta.fetchall()#guarda el resultado de la consulta
+
+               opciones=[]
+
+               for fecha in fechas:
+                    opciones.append(fecha[0])
+               return opciones
+          except sqlite3.Error as e:
+               messagebox.showerror('Fitness World', f'ERROR: It was not possible to load the dates. \n\n{e}')
+               return[]
+          finally:
+               consulta.close()
+               db4.close()
+          
 class Insertar:
      def __init__(self):
           windowsInsert=Toplevel()
@@ -252,26 +276,9 @@ class Borrar:
           self.loadDates()
 
      def loadDates(self):
-          conexion = ConexionDB()
-          db4 = conexion.conectar()
-          consulta=db4.cursor()
-
-          try:
-               consulta.execute("""SELECT DISTINCT date
-                                   FROM medidas
-                                   ORDER BY date""")
-               fechas=consulta.fetchall()#guarda el resultado de la consulta
-
-               opciones=[]
-               for fecha in fechas:
-                    opciones.append(fecha[0])
-               #Introducir las fechas en el combobox
-               self.combo['values']=opciones
-          except sqlite3.Error as e:
-               messagebox.showerror('Fitness World', f'ERROR: It was not possible to load the dates. \n\n{e}')
-          finally:
-               consulta.close()
-               db4.close()
+          medidas=MedidasDB()
+          fechas=medidas.obtenerFechas()
+          self.combo['values']=fechas
 
      def deleteData(self):
 
