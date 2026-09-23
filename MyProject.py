@@ -201,11 +201,18 @@ class Consultar:
 
      def consultData(self):
           semanasSeleccionadas=self.listasemanas.curselection()#devuelve una tupla con los indices de las semanas seleccionadas
+
           #comprobar que se hay seleccionado al menos una semana
           if not semanasSeleccionadas:
                messagebox.showerror('Fitness World','Select at least one week')
                return
           print('Selected weeks:',semanasSeleccionadas)
+
+          fechasSeleccionadas=[]
+          for indice in semanasSeleccionadas:
+               fechasSeleccionadas.append(self.fechas[indice])#agrega a la lista de fechas seleccionadas las fechas correspondientes a los indices seleccionados
+          print('Selected dates:',fechasSeleccionadas)
+          print('selected weeks:',semanasSeleccionadas)
           
           conexion = ConexionDB()
           db2 = conexion.conectar()
