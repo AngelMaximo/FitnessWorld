@@ -144,15 +144,16 @@ class Consultar:
 
           
 
-          self.week=Label(windowsconsult,text='Date',fg='black',bg='white')
+          self.week=Label(windowsconsult,text='Select weeks',fg='black',bg='white')
           self.week.pack(side=TOP)
 
-          #Combobox para seleccionar por fecha
-          self.combo=ttk.Combobox(
+          #Lista para seleccionar varias semanas
+          self.listasemanas=Listbox(
                windowsconsult,
-               state="readonly"
+               selectmode=MULTIPLE,#Permite seleccionar varias fechas
+               height=5,
           )
-          self.combo.pack(pady=20)
+          self.listasemanas.pack(pady=20)
 
           #Boton consultar
           self.consult=Button(
@@ -188,19 +189,23 @@ class Consultar:
           )
 
           #Carga las fechas de la base de datos
+          self.fechas = []
           self.loadDates()
 
      def loadDates(self):
           medidas=MedidasDB()
-          fechas=medidas.obtenerFechas()
-          self.combo['values']=fechas
+          self.fechas=medidas.obtenerFechas()
+
+          for numero, fechas in enumerate(self.fechas, start=1):#enumerate devuelve el indice y el valor de la lista, start=1 para que empiece en 1
+               self.listasemanas.insert(END,f'semana {numero}')#inserta en la lista el numero de semana
 
      def consultData(self):
-          fecha=self.combo.get()
-          #comprobar que se hay seleccionado una fecha
-          if not fecha:
-               messagebox.showerror('Fitness World','Select a date')
+          semanasSeleccionadas=self.listasemanas.curselection()#devuelve una tupla con los indices de las semanas seleccionadas
+          #comprobar que se hay seleccionado al menos una semana
+          if not semanasSeleccionadas:
+               messagebox.showerror('Fitness World','Select at least one week')
                return
+          print('Selected weeks:',semanasSeleccionadas)
           
           conexion = ConexionDB()
           db2 = conexion.conectar()
