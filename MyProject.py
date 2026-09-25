@@ -206,14 +206,13 @@ class Consultar:
           if not semanasSeleccionadas:
                messagebox.showerror('Fitness World','Select at least one week')
                return
-          print('Selected weeks:',semanasSeleccionadas)
 
           fechasSeleccionadas=[]
           for indice in semanasSeleccionadas:
                fechasSeleccionadas.append(self.fechas[indice])#agrega a la lista de fechas seleccionadas las fechas correspondientes a los indices seleccionados
-          print('Selected dates:',fechasSeleccionadas)
-          print('selected weeks:',semanasSeleccionadas)
-          
+
+          placeholder = ','.join('?' for _ in fechasSeleccionadas) #Crea un placeholder (marcadores de posición) para la consulta SQL, por ejemplo: ?,?,? para 3 fechas seleccionadas
+
           conexion = ConexionDB()
           db2 = conexion.conectar()
           
@@ -222,10 +221,12 @@ class Consultar:
           consulta=db2.cursor()
 
           try:
-               #Buscar el registro en la fecha seleccionada
-               consulta.execute(""" SELECT date, weight, waist, biceps, leg, gluteus
+               #Buscar el registro en las fechas seleccionadas
+               #La f se utiliza para para crear un f-string (o cadena con formato), lo que permite insertar variables y operaciones matemáticas directamente dentro del texto usando llaves
+               consulta.execute(f""" SELECT date, weight, waist, biceps, leg, gluteus
                FROM medidas
-               WHERE date=?""",(fecha,))
+               WHERE date IN ({placeholder})
+               ORDER BY date""", fechasSeleccionadas)#Se encarga de buscar los registros en la base de datos que coincidan con las fechas seleccionadas y ordenarlos por fecha. El placeholder se reemplaza por las fechas seleccionadas en la consulta SQL.
 
                registros=consulta.fetchall()#guarda todos los resultados 
 
